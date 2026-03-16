@@ -1,0 +1,29 @@
+{
+    "name": "psychedcms/psychedcms-auth",
+    "description": "Authentication bundle for PsychedCMS — User entity, JWT login, admin commands",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "PsychedCms\\Auth\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.3",
+        "doctrine/orm": "^3.0",
+        "lexik/jwt-authentication-bundle": "^3.0",
+        "symfony/framework-bundle": "^7.4",
+        "symfony/password-hasher": "^7.4",
+        "symfony/security-bundle": "^7.4",
+        "symfony/uid": "^7.4"
+    },
+    "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.0",
+        "theofidry/alice-data-fixtures": "^1.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    }
+}

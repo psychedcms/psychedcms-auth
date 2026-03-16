@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    PsychedCms\Auth\:
+        resource: '../src/'
+        exclude:
+            - '../src/Entity/'
+            - '../src/PsychedCmsAuthBundle.php'
+
+    PsychedCms\Auth\Repository\UserRepositoryInterface:
+        alias: PsychedCms\Auth\Repository\UserRepository
+
+    PsychedCms\Auth\State\UserPasswordProcessor:
+        arguments:
+            $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+
+    PsychedCms\Auth\Security\PermissionRegistry:
+        arguments:
+            $roleHierarchy: '@security.role_hierarchy'
