@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PsychedCms\Auth\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -18,6 +19,7 @@ use PsychedCms\Auth\State\UserPasswordProcessor;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -39,11 +41,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'ulid')]
-    #[Groups(['user:read', 'content:read'])]
+    #[ApiProperty(identifier: false, readable: false)]
     private Ulid $id;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(['user:read', 'user:write', 'content:read'])]
+    #[ApiProperty(identifier: true)]
     private string $username;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -73,6 +76,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): Ulid
     {
         return $this->id;
+    }
+
+    #[Groups(['user:read'])]
+    #[SerializedName('id')]
+    public function getApiIdentifier(): string
+    {
+        return $this->username;
     }
 
     public function getUsername(): string
