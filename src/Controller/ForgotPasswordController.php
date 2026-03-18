@@ -10,7 +10,9 @@ use PsychedCms\Auth\Service\PasswordResetMailer;
 use PsychedCms\Auth\Service\PasswordResetTokenGenerator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
@@ -21,11 +23,22 @@ final readonly class ForgotPasswordController
         private PasswordResetTokenRepository $tokenRepository,
         private PasswordResetTokenGenerator $tokenGenerator,
         private PasswordResetMailer $mailer,
+        private RateLimiterFactory $forgotPasswordLimiter,
     ) {}
 
     #[Route('/api/forgot-password', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
+        $limiter = $this->forgotPasswordLimiter->create($request->getClientIp() ?? 'unknown');
+        $limit = $limiter->consume();
+        if (!$limit->isAccepted()) {
+            return new JsonResponse(
+                ['message' => 'Too many requests. Please try again later.'],
+                Response::HTTP_TOO_MANY_REQUESTS,
+                ['Retry-After' => (string) ($limit->getRetryAfter()->getTimestamp() - time())],
+            );
+        }
+
         $data = \json_decode($request->getContent(), true);
         $email = $data['email'] ?? '';
 

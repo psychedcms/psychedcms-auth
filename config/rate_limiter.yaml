@@ -1,0 +1,10 @@
+framework:
+    rate_limiter:
+        forgot_password:
+            policy: 'sliding_window'
+            limit: 3
+            interval: '15 minutes'
+        reset_password:
+            policy: 'sliding_window'
+            limit: 5
+            interval: '15 minutes'

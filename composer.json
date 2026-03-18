@@ -16,6 +16,7 @@
         "symfony/mailer": "^7.4",
         "symfony/password-hasher": "^7.4",
         "symfony/security-bundle": "^7.4",
+        "symfony/rate-limiter": "^7.4",
         "symfony/uid": "^7.4"
     },
     "require-dev": {

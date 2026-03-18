@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
@@ -20,11 +21,22 @@ final readonly class ResetPasswordController
         private PasswordResetTokenRepository $tokenRepository,
         private UserPasswordHasherInterface $passwordHasher,
         private EntityManagerInterface $entityManager,
+        private RateLimiterFactory $resetPasswordLimiter,
     ) {}
 
     #[Route('/api/reset-password', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
+        $limiter = $this->resetPasswordLimiter->create($request->getClientIp() ?? 'unknown');
+        $limit = $limiter->consume();
+        if (!$limit->isAccepted()) {
+            return new JsonResponse(
+                ['message' => 'Too many requests. Please try again later.'],
+                Response::HTTP_TOO_MANY_REQUESTS,
+                ['Retry-After' => (string) ($limit->getRetryAfter()->getTimestamp() - time())],
+            );
+        }
+
         $data = \json_decode($request->getContent(), true);
         $tokenValue = $data['token'] ?? '';
         $password = $data['password'] ?? '';

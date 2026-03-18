@@ -20,6 +20,14 @@ services:
         arguments:
             $roleHierarchy: '@security.role_hierarchy'
 
+    PsychedCms\Auth\Controller\ForgotPasswordController:
+        arguments:
+            $forgotPasswordLimiter: '@limiter.forgot_password'
+
+    PsychedCms\Auth\Controller\ResetPasswordController:
+        arguments:
+            $resetPasswordLimiter: '@limiter.reset_password'
+
     PsychedCms\Auth\Service\PasswordResetMailer:
         arguments:
             $adminUrl: '%env(ADMIN_URL)%'
