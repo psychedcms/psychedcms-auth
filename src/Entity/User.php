@@ -66,6 +66,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:write'])]
     private ?string $locale = null;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['user:read'])]
+    private ?array $avatar = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['user:read'])]
+    private ?array $banner = null;
+
     public function __construct(string $username, string $email)
     {
         $this->id = new Ulid();
@@ -158,6 +166,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLocale(?string $locale): static
     {
         $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?array
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?array $avatar): static
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getBanner(): ?array
+    {
+        return $this->banner;
+    }
+
+    public function setBanner(?array $banner): static
+    {
+        $this->banner = $banner;
 
         return $this;
     }
