@@ -47,6 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(['user:read', 'user:write', 'content:read'])]
     #[ApiProperty(identifier: true)]
+    #[\PsychedCms\Elasticsearch\Attribute\IndexedField(type: 'keyword', facetable: true)]
     private string $username;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -67,7 +68,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $locale = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'content:read'])]
     private ?array $avatar = null;
 
     #[ORM\Column(type: 'json', nullable: true)]

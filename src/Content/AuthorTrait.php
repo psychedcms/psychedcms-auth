@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use Doctrine\ORM\Mapping as ORM;
 use PsychedCms\Auth\Entity\User;
 use PsychedCms\Core\Attribute\Field\RelationField;
+use PsychedCms\Elasticsearch\Attribute\IndexedField;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 trait AuthorTrait
@@ -15,6 +16,7 @@ trait AuthorTrait
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
     #[RelationField(label: 'Author', reference: 'users', displayField: 'username', group: 'meta')]
+    #[IndexedField(type: 'object', useRelationFacets: true, properties: ['id' => ['type' => 'keyword'], 'username' => ['type' => 'keyword']])]
     #[Groups(['content:read', 'content:write'])]
     private ?User $author = null;
 

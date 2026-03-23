@@ -1,6 +1,6 @@
 {
     "name": "psychedcms/psychedcms-auth",
-    "description": "Authentication bundle for PsychedCMS — User entity, JWT login, admin commands",
+    "description": "Authentication bundle for PsychedCMS \u2014 User entity, JWT login, admin commands",
     "type": "symfony-bundle",
     "license": "MIT",
     "autoload": {
@@ -27,5 +27,8 @@
         "branch-alias": {
             "dev-main": "0.1.x-dev"
         }
+    },
+    "suggest": {
+        "psychedcms/psychedcms-elasticsearch": "Required for IndexedField attributes on author relation"
     }
 }
