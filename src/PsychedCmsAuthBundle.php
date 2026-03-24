@@ -45,7 +45,7 @@ final class PsychedCmsAuthBundle extends AbstractBundle
                 'psychedcms_user_provider' => [
                     'entity' => [
                         'class' => 'PsychedCms\Auth\Entity\User',
-                        'property' => 'username',
+                        'property' => 'email',
                     ],
                 ],
             ],
@@ -59,9 +59,15 @@ final class PsychedCmsAuthBundle extends AbstractBundle
                     ],
                     'json_login' => [
                         'check_path' => '/api/login',
+                        'username_path' => 'email',
                         'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
                         'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure',
                     ],
+                ],
+                'public_auth' => [
+                    'pattern' => '^/api/(register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
+                    'stateless' => true,
+                    'security' => false,
                 ],
                 'api' => [
                     'pattern' => '^/api',

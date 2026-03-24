@@ -75,6 +75,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     private ?array $banner = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['user:read'])]
+    private ?\DateTimeImmutable $activatedAt = null;
+
     public function __construct(string $username, string $email)
     {
         $this->id = new Ulid();
@@ -121,7 +125,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Override]
     public function getUserIdentifier(): string
     {
-        return $this->username;
+        return $this->email;
     }
 
     /**
@@ -193,6 +197,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->banner = $banner;
 
         return $this;
+    }
+
+    public function getActivatedAt(): ?\DateTimeImmutable
+    {
+        return $this->activatedAt;
+    }
+
+    public function setActivatedAt(?\DateTimeImmutable $activatedAt): static
+    {
+        $this->activatedAt = $activatedAt;
+
+        return $this;
+    }
+
+    public function isActivated(): bool
+    {
+        return $this->activatedAt !== null;
     }
 
     #[Override]

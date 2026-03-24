@@ -28,9 +28,33 @@ services:
         arguments:
             $resetPasswordLimiter: '@limiter.reset_password'
 
+    PsychedCms\Auth\Controller\RegisterController:
+        arguments:
+            $registerLimiter: '@limiter.register'
+            $cookieDomain: '%env(COOKIE_DOMAIN)%'
+            $appEnv: '%kernel.environment%'
+
+    PsychedCms\Auth\Controller\AcceptInvitationController:
+        arguments:
+            $acceptInvitationLimiter: '@limiter.accept_invitation'
+
+    PsychedCms\Auth\Controller\ResendVerificationController:
+        arguments:
+            $resendVerificationLimiter: '@limiter.resend_verification'
+
+    PsychedCms\Auth\Controller\ResendInvitationController:
+        arguments:
+            $resendInvitationLimiter: '@limiter.resend_invitation'
+
     PsychedCms\Auth\Service\PasswordResetMailer:
         arguments:
             $adminUrl: '%env(ADMIN_URL)%'
+            $fromAddress: '%env(default:password_reset_from_default:PASSWORD_RESET_FROM)%'
+
+    PsychedCms\Auth\Service\InvitationMailer:
+        arguments:
+            $adminUrl: '%env(ADMIN_URL)%'
+            $frontendUrl: '%env(FRONTEND_URL)%'
             $fromAddress: '%env(default:password_reset_from_default:PASSWORD_RESET_FROM)%'
 
 parameters:
