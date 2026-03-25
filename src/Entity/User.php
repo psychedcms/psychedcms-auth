@@ -79,6 +79,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     private ?\DateTimeImmutable $activatedAt = null;
 
+    /** @var array{lat: float, lng: float, name: string}|null */
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['user:read', 'user:write'])]
+    private ?array $defaultLocation = null;
+
     public function __construct(string $username, string $email)
     {
         $this->id = new Ulid();
@@ -214,6 +219,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isActivated(): bool
     {
         return $this->activatedAt !== null;
+    }
+
+    /** @return array{lat: float, lng: float, name: string}|null */
+    public function getDefaultLocation(): ?array
+    {
+        return $this->defaultLocation;
+    }
+
+    /** @param array{lat: float, lng: float, name: string}|null $defaultLocation */
+    public function setDefaultLocation(?array $defaultLocation): static
+    {
+        $this->defaultLocation = $defaultLocation;
+
+        return $this;
     }
 
     #[Override]
