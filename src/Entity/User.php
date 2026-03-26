@@ -84,6 +84,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:write'])]
     private ?array $defaultLocation = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['user:read', 'user:write'])]
+    private ?string $bio = null;
+
+    #[ORM\Column(length: 10, options: ['default' => 'public'])]
+    #[Groups(['user:read', 'user:write'])]
+    private string $profileVisibility = 'public';
+
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    #[Groups(['user:read', 'user:write'])]
+    private bool $showFollowing = true;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    #[Groups(['user:read'])]
+    private int $followerCount = 0;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    #[Groups(['user:read'])]
+    private int $followingCount = 0;
+
     public function __construct(string $username, string $email)
     {
         $this->id = new Ulid();
@@ -231,6 +251,99 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDefaultLocation(?array $defaultLocation): static
     {
         $this->defaultLocation = $defaultLocation;
+
+        return $this;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): static
+    {
+        $this->bio = $bio;
+
+        return $this;
+    }
+
+    public function getProfileVisibility(): string
+    {
+        return $this->profileVisibility;
+    }
+
+    public function setProfileVisibility(string $profileVisibility): static
+    {
+        $this->profileVisibility = $profileVisibility;
+
+        return $this;
+    }
+
+    public function isProfilePrivate(): bool
+    {
+        return $this->profileVisibility === 'private';
+    }
+
+    public function getShowFollowing(): bool
+    {
+        return $this->showFollowing;
+    }
+
+    public function setShowFollowing(bool $showFollowing): static
+    {
+        $this->showFollowing = $showFollowing;
+
+        return $this;
+    }
+
+    public function getFollowerCount(): int
+    {
+        return $this->followerCount;
+    }
+
+    public function setFollowerCount(int $followerCount): static
+    {
+        $this->followerCount = $followerCount;
+
+        return $this;
+    }
+
+    public function incrementFollowerCount(): static
+    {
+        ++$this->followerCount;
+
+        return $this;
+    }
+
+    public function decrementFollowerCount(): static
+    {
+        $this->followerCount = \max(0, $this->followerCount - 1);
+
+        return $this;
+    }
+
+    public function getFollowingCount(): int
+    {
+        return $this->followingCount;
+    }
+
+    public function setFollowingCount(int $followingCount): static
+    {
+        $this->followingCount = $followingCount;
+
+        return $this;
+    }
+
+    public function incrementFollowingCount(): static
+    {
+        ++$this->followingCount;
+
+        return $this;
+    }
+
+    public function decrementFollowingCount(): static
+    {
+        $this->followingCount = \max(0, $this->followingCount - 1);
 
         return $this;
     }
