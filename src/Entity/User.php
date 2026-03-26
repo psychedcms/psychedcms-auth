@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Override;
 use PsychedCms\Auth\Repository\UserRepository;
+use PsychedCms\Media\Attribute\ImageField;
 use PsychedCms\Auth\State\UserPasswordProcessor;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -27,6 +28,11 @@ use Symfony\Component\Uid\Ulid;
 #[ApiResource(
     shortName: 'User',
     operations: [
+        new Get(
+            uriTemplate: '/profiles/{username}',
+            security: 'true',
+            normalizationContext: ['groups' => ['profile:read']],
+        ),
         new GetCollection(security: 'is_granted("PERMISSION_USERS_MANAGE")'),
         new Get(security: 'is_granted("PERMISSION_USERS_MANAGE")'),
         new Post(security: 'is_granted("PERMISSION_USERS_MANAGE")', processor: UserPasswordProcessor::class),
@@ -45,7 +51,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Ulid $id;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['user:read', 'user:write', 'content:read'])]
+    #[Groups(['user:read', 'user:write', 'content:read', 'profile:read'])]
     #[ApiProperty(identifier: true)]
     #[\PsychedCms\Elasticsearch\Attribute\IndexedField(type: 'keyword', facetable: true)]
     private string $username;
@@ -68,11 +74,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $locale = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
-    #[Groups(['user:read', 'content:read'])]
+    #[ImageField(label: 'Avatar', group: 'media', dimensions: ['avatar' => [400, 400]])]
+    #[Groups(['user:read', 'content:read', 'profile:read'])]
     private ?array $avatar = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
-    #[Groups(['user:read'])]
+    #[ImageField(label: 'Banner', group: 'media', dimensions: ['banner' => [1600, 400]])]
+    #[Groups(['user:read', 'profile:read'])]
     private ?array $banner = null;
 
     #[ORM\Column(nullable: true)]
@@ -85,23 +93,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?array $defaultLocation = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:write', 'profile:read'])]
     private ?string $bio = null;
 
     #[ORM\Column(length: 10, options: ['default' => 'public'])]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:write', 'profile:read'])]
     private string $profileVisibility = 'public';
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:write', 'profile:read'])]
     private bool $showFollowing = true;
 
     #[ORM\Column(type: 'integer', options: ['default' => 0])]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'profile:read'])]
     private int $followerCount = 0;
 
     #[ORM\Column(type: 'integer', options: ['default' => 0])]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'profile:read'])]
     private int $followingCount = 0;
 
     public function __construct(string $username, string $email)
@@ -116,7 +124,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'profile:read'])]
     #[SerializedName('id')]
     public function getApiIdentifier(): string
     {
