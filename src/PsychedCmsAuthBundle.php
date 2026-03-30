@@ -64,6 +64,13 @@ final class PsychedCmsAuthBundle extends AbstractBundle
                         'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure',
                     ],
                 ],
+                'refresh' => [
+                    'pattern' => '^/api/token/refresh',
+                    'stateless' => true,
+                    'refresh_jwt' => [
+                        'check_path' => '/api/token/refresh',
+                    ],
+                ],
                 'public_auth' => [
                     'pattern' => '^/api/(register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
                     'stateless' => true,
