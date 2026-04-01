@@ -15,7 +15,6 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Override;
 use PsychedCms\Auth\Repository\UserRepository;
-use PsychedCms\Media\Attribute\ImageField;
 use PsychedCms\Auth\State\UserPasswordProcessor;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -28,11 +27,6 @@ use Symfony\Component\Uid\Ulid;
 #[ApiResource(
     shortName: 'User',
     operations: [
-        new Get(
-            uriTemplate: '/profiles/{username}',
-            security: 'true',
-            normalizationContext: ['groups' => ['profile:read']],
-        ),
         new GetCollection(security: 'is_granted("PERMISSION_USERS_MANAGE")'),
         new Get(security: 'is_granted("PERMISSION_USERS_MANAGE")'),
         new Post(security: 'is_granted("PERMISSION_USERS_MANAGE")', processor: UserPasswordProcessor::class),
@@ -74,43 +68,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $locale = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
-    #[ImageField(label: 'Avatar', group: 'media', dimensions: ['avatar' => [400, 400]])]
     #[Groups(['user:read', 'content:read', 'profile:read'])]
     private ?array $avatar = null;
-
-    #[ORM\Column(type: 'json', nullable: true)]
-    #[ImageField(label: 'Banner', group: 'media', dimensions: ['banner' => [1600, 400]])]
-    #[Groups(['user:read', 'profile:read'])]
-    private ?array $banner = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['user:read'])]
     private ?\DateTimeImmutable $activatedAt = null;
-
-    /** @var array{lat: float, lng: float, name: string}|null */
-    #[ORM\Column(type: 'json', nullable: true)]
-    #[Groups(['user:read', 'user:write'])]
-    private ?array $defaultLocation = null;
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['user:read', 'user:write', 'profile:read'])]
-    private ?string $bio = null;
-
-    #[ORM\Column(length: 10, options: ['default' => 'public'])]
-    #[Groups(['user:read', 'user:write', 'profile:read'])]
-    private string $profileVisibility = 'public';
-
-    #[ORM\Column(type: 'boolean', options: ['default' => true])]
-    #[Groups(['user:read', 'user:write', 'profile:read'])]
-    private bool $showFollowing = true;
-
-    #[ORM\Column(type: 'integer', options: ['default' => 0])]
-    #[Groups(['user:read', 'profile:read'])]
-    private int $followerCount = 0;
-
-    #[ORM\Column(type: 'integer', options: ['default' => 0])]
-    #[Groups(['user:read', 'profile:read'])]
-    private int $followingCount = 0;
 
     public function __construct(string $username, string $email)
     {
@@ -220,18 +183,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getBanner(): ?array
-    {
-        return $this->banner;
-    }
-
-    public function setBanner(?array $banner): static
-    {
-        $this->banner = $banner;
-
-        return $this;
-    }
-
     public function getActivatedAt(): ?\DateTimeImmutable
     {
         return $this->activatedAt;
@@ -247,113 +198,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isActivated(): bool
     {
         return $this->activatedAt !== null;
-    }
-
-    /** @return array{lat: float, lng: float, name: string}|null */
-    public function getDefaultLocation(): ?array
-    {
-        return $this->defaultLocation;
-    }
-
-    /** @param array{lat: float, lng: float, name: string}|null $defaultLocation */
-    public function setDefaultLocation(?array $defaultLocation): static
-    {
-        $this->defaultLocation = $defaultLocation;
-
-        return $this;
-    }
-
-    public function getBio(): ?string
-    {
-        return $this->bio;
-    }
-
-    public function setBio(?string $bio): static
-    {
-        $this->bio = $bio;
-
-        return $this;
-    }
-
-    public function getProfileVisibility(): string
-    {
-        return $this->profileVisibility;
-    }
-
-    public function setProfileVisibility(string $profileVisibility): static
-    {
-        $this->profileVisibility = $profileVisibility;
-
-        return $this;
-    }
-
-    public function isProfilePrivate(): bool
-    {
-        return $this->profileVisibility === 'private';
-    }
-
-    public function getShowFollowing(): bool
-    {
-        return $this->showFollowing;
-    }
-
-    public function setShowFollowing(bool $showFollowing): static
-    {
-        $this->showFollowing = $showFollowing;
-
-        return $this;
-    }
-
-    public function getFollowerCount(): int
-    {
-        return $this->followerCount;
-    }
-
-    public function setFollowerCount(int $followerCount): static
-    {
-        $this->followerCount = $followerCount;
-
-        return $this;
-    }
-
-    public function incrementFollowerCount(): static
-    {
-        ++$this->followerCount;
-
-        return $this;
-    }
-
-    public function decrementFollowerCount(): static
-    {
-        $this->followerCount = \max(0, $this->followerCount - 1);
-
-        return $this;
-    }
-
-    public function getFollowingCount(): int
-    {
-        return $this->followingCount;
-    }
-
-    public function setFollowingCount(int $followingCount): static
-    {
-        $this->followingCount = $followingCount;
-
-        return $this;
-    }
-
-    public function incrementFollowingCount(): static
-    {
-        ++$this->followingCount;
-
-        return $this;
-    }
-
-    public function decrementFollowingCount(): static
-    {
-        $this->followingCount = \max(0, $this->followingCount - 1);
-
-        return $this;
     }
 
     #[Override]
