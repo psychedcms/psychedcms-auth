@@ -30,8 +30,9 @@ services:
 
     PsychedCms\Auth\Controller\RegisterController:
         arguments:
+            $jwtManager: null
             $registerLimiter: '@limiter.register'
-            $cookieDomain: '%env(COOKIE_DOMAIN)%'
+            $cookieDomain: '%env(default::COOKIE_DOMAIN)%'
             $appEnv: '%kernel.environment%'
 
     PsychedCms\Auth\Controller\AcceptInvitationController:

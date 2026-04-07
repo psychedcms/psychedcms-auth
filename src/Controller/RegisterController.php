@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace PsychedCms\Auth\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use PsychedCms\Auth\Entity\User;
 use PsychedCms\Auth\Repository\UserRepository;
 use PsychedCms\Auth\Service\InvitationMailer;
@@ -20,18 +19,18 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-final readonly class RegisterController
+final class RegisterController
 {
     public function __construct(
-        private UserRepository $userRepository,
-        private UserPasswordHasherInterface $passwordHasher,
-        private EntityManagerInterface $entityManager,
-        private JWTTokenManagerInterface $jwtManager,
-        private InvitationTokenGenerator $invitationTokenGenerator,
-        private InvitationMailer $invitationMailer,
-        private RateLimiterFactory $registerLimiter,
-        private string $cookieDomain,
-        private string $appEnv,
+        private readonly UserRepository $userRepository,
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ?object $jwtManager,
+        private readonly InvitationTokenGenerator $invitationTokenGenerator,
+        private readonly InvitationMailer $invitationMailer,
+        private readonly RateLimiterFactory $registerLimiter,
+        private readonly string $cookieDomain,
+        private readonly string $appEnv,
     ) {}
 
     #[Route('/api/register', methods: ['POST'])]
@@ -51,7 +50,6 @@ final readonly class RegisterController
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
 
-        // Validate email
         if (!\is_string($email) || !\filter_var($email, \FILTER_VALIDATE_EMAIL)) {
             return new JsonResponse(
                 ['error' => 'A valid email address is required.'],
@@ -59,7 +57,6 @@ final readonly class RegisterController
             );
         }
 
-        // Check email uniqueness
         if ($this->userRepository->findByEmail($email) !== null) {
             return new JsonResponse(
                 ['error' => 'This email is already registered.'],
@@ -67,7 +64,6 @@ final readonly class RegisterController
             );
         }
 
-        // Validate password
         if (!\is_string($password) || \strlen($password) < 8
             || !\preg_match('/[a-zA-Z]/', $password)
             || !\preg_match('/[0-9]/', $password)
@@ -78,7 +74,6 @@ final readonly class RegisterController
             );
         }
 
-        // Generate username from email prefix, with numeric suffix on collision
         $baseUsername = \explode('@', $email)[0];
         $username = $baseUsername;
         $suffix = 1;
@@ -89,16 +84,15 @@ final readonly class RegisterController
 
         $user = new User($username, $email);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
-        // activatedAt stays null — user must verify email
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        // Send verification email
         $verificationToken = $this->invitationTokenGenerator->generate($user);
         $this->invitationMailer->sendVerification($user, $verificationToken);
 
-        $token = $this->jwtManager->create($user);
+        // JWT token creation — only when Lexik is installed
+        $token = $this->jwtManager !== null ? $this->jwtManager->create($user) : null;
 
         $response = new JsonResponse([
             'token' => $token,
@@ -114,16 +108,18 @@ final readonly class RegisterController
             ],
         ], Response::HTTP_CREATED);
 
-        $response->headers->setCookie(
-            Cookie::create('jwt')
-                ->withValue($token)
-                ->withExpires(0)
-                ->withPath('/')
-                ->withDomain($this->cookieDomain)
-                ->withSecure($this->appEnv === 'prod')
-                ->withHttpOnly(true)
-                ->withSameSite('lax')
-        );
+        if ($token !== null) {
+            $response->headers->setCookie(
+                Cookie::create('jwt')
+                    ->withValue($token)
+                    ->withExpires(0)
+                    ->withPath('/')
+                    ->withDomain($this->cookieDomain)
+                    ->withSecure($this->appEnv === 'prod')
+                    ->withHttpOnly(true)
+                    ->withSameSite('lax')
+            );
+        }
 
         return $response;
     }
