@@ -16,6 +16,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Override;
 use PsychedCms\Auth\Repository\UserRepository;
 use PsychedCms\Auth\State\UserPasswordProcessor;
+use PsychedCms\AuthOidc\Content\ExternalIdentityInterface;
+use PsychedCms\AuthOidc\Content\ExternalIdentityTrait;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -37,8 +39,10 @@ use Symfony\Component\Uid\Ulid;
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
 )]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, ExternalIdentityInterface
 {
+    use ExternalIdentityTrait;
+
     #[ORM\Id]
     #[ORM\Column(type: 'ulid')]
     #[ApiProperty(identifier: false, readable: false)]

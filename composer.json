@@ -1,6 +1,6 @@
 {
     "name": "psychedcms/psychedcms-auth",
-    "description": "Authentication bundle for PsychedCMS \u2014 User entity, JWT login, admin commands",
+    "description": "Authentication bundle for PsychedCMS \u2014 User entity, OIDC login, admin commands",
     "type": "symfony-bundle",
     "license": "MIT",
     "autoload": {
@@ -11,7 +11,6 @@
     "require": {
         "php": "^8.3",
         "doctrine/orm": "^3.0",
-        "lexik/jwt-authentication-bundle": "^3.0",
         "symfony/framework-bundle": "^7.4",
         "symfony/mailer": "^7.4",
         "symfony/password-hasher": "^7.4",

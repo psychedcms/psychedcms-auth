@@ -50,27 +50,6 @@ final class PsychedCmsAuthBundle extends AbstractBundle
                 ],
             ],
             'firewalls' => [
-                'login' => [
-                    'pattern' => '^/api/login',
-                    'stateless' => true,
-                    'login_throttling' => [
-                        'max_attempts' => 5,
-                        'interval' => '15 minutes',
-                    ],
-                    'json_login' => [
-                        'check_path' => '/api/login',
-                        'username_path' => 'email',
-                        'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
-                        'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure',
-                    ],
-                ],
-                'refresh' => [
-                    'pattern' => '^/api/token/refresh',
-                    'stateless' => true,
-                    'refresh_jwt' => [
-                        'check_path' => '/api/token/refresh',
-                    ],
-                ],
                 'public_auth' => [
                     'pattern' => '^/api/(register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
                     'stateless' => true,
@@ -79,7 +58,7 @@ final class PsychedCmsAuthBundle extends AbstractBundle
                 'api' => [
                     'pattern' => '^/api',
                     'stateless' => true,
-                    'jwt' => [],
+                    'custom_authenticators' => ['psychedcms_auth_oidc.authenticator'],
                 ],
             ],
         ]);
