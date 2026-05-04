@@ -51,14 +51,23 @@ final class PsychedCmsAuthBundle extends AbstractBundle
             ],
             'firewalls' => [
                 'public_auth' => [
-                    'pattern' => '^/api/(register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
+                    'pattern' => '^/api/(token/refresh|register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
                     'stateless' => true,
                     'security' => false,
                 ],
                 'api' => [
                     'pattern' => '^/api',
                     'stateless' => true,
-                    'custom_authenticators' => ['psychedcms_auth_oidc.authenticator'],
+                    'json_login' => [
+                        'check_path' => '/api/login',
+                        'username_path' => 'email',
+                        'password_path' => 'password',
+                        'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
+                        'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure',
+                    ],
+                    'jwt' => [],
+                    'custom_authenticators' => ['PsychedCms\Auth\Security\ServiceTokenAuthenticator'],
+                    'entry_point' => 'jwt',
                 ],
             ],
         ]);
