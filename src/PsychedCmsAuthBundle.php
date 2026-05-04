@@ -51,7 +51,7 @@ final class PsychedCmsAuthBundle extends AbstractBundle
             ],
             'firewalls' => [
                 'public_auth' => [
-                    'pattern' => '^/api/(token/refresh|register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
+                    'pattern' => '^/api/(health|token/refresh|register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
                     'stateless' => true,
                     'security' => false,
                 ],
