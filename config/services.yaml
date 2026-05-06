@@ -20,6 +20,10 @@ services:
         arguments:
             $roleHierarchy: '@security.role_hierarchy'
 
+    PsychedCms\Auth\Security\PermissionCatalog:
+        arguments:
+            $contributedPermissions: '%psyched_cms_auth.permissions%'
+
     PsychedCms\Auth\Security\ServiceTokenAuthenticator:
         arguments:
             $serviceToken: '%env(default:service_token_default:SERVICE_TOKEN)%'

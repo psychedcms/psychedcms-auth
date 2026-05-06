@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PsychedCms\Auth;
 
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -15,6 +16,21 @@ final class PsychedCmsAuthBundle extends AbstractBundle
     public function getPath(): string
     {
         return \dirname(__DIR__);
+    }
+
+    public function configure(DefinitionConfigurator $definition): void
+    {
+        $definition->rootNode()
+            ->children()
+                ->arrayNode('permissions')
+                    ->info('Permissions contributed by other bundles via prependExtensionConfig, grouped by group name. Format: { group: [permission1, permission2] }')
+                    ->useAttributeAsKey('group')
+                    ->normalizeKeys(false)
+                    ->arrayPrototype()
+                        ->scalarPrototype()->end()
+                    ->end()
+                ->end()
+            ->end();
     }
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
@@ -81,5 +97,7 @@ final class PsychedCmsAuthBundle extends AbstractBundle
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $container->import('../config/services.yaml');
+
+        $builder->setParameter('psyched_cms_auth.permissions', $config['permissions'] ?? []);
     }
 }
