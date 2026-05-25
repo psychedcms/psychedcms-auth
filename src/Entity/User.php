@@ -79,7 +79,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Externa
     #[Groups(['user:read'])]
     private ?\DateTimeImmutable $activatedAt = null;
 
-    public function __construct(string $username, string $email)
+    public function __construct(string $username = '', string $email = '')
     {
         $this->id = new Ulid();
         $this->username = $username;
