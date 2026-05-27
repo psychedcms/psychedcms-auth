@@ -8,6 +8,11 @@
             "PsychedCms\\Auth\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "PsychedCms\\Auth\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": "^8.3",
         "doctrine/orm": "^3.0",
@@ -20,7 +25,11 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
+        "phpunit/phpunit": "^11.0",
         "theofidry/alice-data-fixtures": "^1.0"
+    },
+    "scripts": {
+        "test": "phpunit"
     },
     "extra": {
         "branch-alias": {

@@ -66,8 +66,20 @@ final class PsychedCmsAuthBundle extends AbstractBundle
                 ],
             ],
             'firewalls' => [
+                // The refresh firewall MUST come before any catch-all `^/api`
+                // firewall, otherwise the latter intercepts the request first
+                // and the refresh-jwt authenticator never runs (route is
+                // declared in routes.yaml but has no controller — gesdinet
+                // 2.x relies entirely on the firewall authenticator).
+                'refresh_token' => [
+                    'pattern' => '^/api/token/refresh$',
+                    'stateless' => true,
+                    'refresh_jwt' => [
+                        'check_path' => '/api/token/refresh',
+                    ],
+                ],
                 'public_auth' => [
-                    'pattern' => '^/api/(health|token/refresh|register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
+                    'pattern' => '^/api/(health|register|forgot-password|reset-password|accept-invitation|verify-email|logout)',
                     'stateless' => true,
                     'security' => false,
                 ],
