@@ -28,6 +28,13 @@ services:
         arguments:
             $serviceToken: '%env(default:service_token_default:SERVICE_TOKEN)%'
 
+    # Make lexik's JWT extractor ignore dotless tokens so the static
+    # SERVICE_TOKEN (M2M) is handled exclusively by ServiceTokenAuthenticator.
+    PsychedCms\Auth\Security\JwtOnlyTokenExtractor:
+        decorates: lexik_jwt_authentication.extractor.chain_extractor
+        arguments:
+            $inner: '@.inner'
+
     PsychedCms\Auth\EventListener\SetJwtCookieOnLoginListener:
         arguments:
             $cookieDomain: '%env(default::COOKIE_DOMAIN)%'

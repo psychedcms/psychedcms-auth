@@ -83,6 +83,18 @@ final class PsychedCmsAuthBundle extends AbstractBundle
                     'stateless' => true,
                     'security' => false,
                 ],
+                // Harden the MCP HTTP transport (/_mcp). MUST come before the
+                // catch-all `api` firewall. Accepts either a JWT (a delegated
+                // editor token carrying act_as_agent, or a normal user JWT) or
+                // the static SERVICE_TOKEN via ServiceTokenAuthenticator (Bearer
+                // non-JWT -> system user ROLE_ADMIN).
+                'mcp' => [
+                    'pattern' => '^/_mcp',
+                    'stateless' => true,
+                    'jwt' => [],
+                    'custom_authenticators' => ['PsychedCms\\Auth\\Security\\ServiceTokenAuthenticator'],
+                    'entry_point' => 'jwt',
+                ],
                 'api' => [
                     'pattern' => '^/api',
                     'stateless' => true,
